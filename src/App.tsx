@@ -1,22 +1,37 @@
-import React, {FC} from 'react';
+
+import React, { useEffect, useState } from 'react';
 import './App.css';
-import Users from './components/Users';
+import { UserCard } from './components/UserCard';
 import { IUser } from './interfaces/IUser';
 
 
-const users: IUser[]= [
-  {"id": 1, "name": "Leanne Graham", "city": "Gwenborough", "username": "Bret",}
-]
 
 
-function App(){
+function App() {
+  const [storage, setStorage] = useState<IUser[]>()
+  const [inputId, setInputId] = useState<string>('')
+
+  const handlerChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const inputValue = event.target.value
+    setInputId(inputValue)
+  }
+
+
+  useEffect(() => {
+    fetch('https://jsonplaceholder.typicode.com/users')
+      .then(res => res.json())
+      .then(setStorage)
+  }, [])
+
+  const storageToCards = storage
+    ?.filter(user => inputId === ''? user.id : inputId=== user.id.toString())
+    ?.map(user => <UserCard key = {user.id} user={user} />)
+
   return (
-    <div className="App">
-   
+    <div className="App" >
+      <input type="text" value={inputId} onChange={handlerChange} />
 
-
-
-     <Users users ={users}/>
+      {storageToCards}
     </div>
   );
 }
